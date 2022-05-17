@@ -5,7 +5,6 @@ const logout = new LogoutButton();
 logout.action = exit => ApiConnector.logout(response => {
 	if (response.success) {
 		location.reload();
-		return;
 	}
 });
 
@@ -13,7 +12,6 @@ logout.action = exit => ApiConnector.logout(response => {
 ApiConnector.current(current => {
 	if (current.success) {
 		ProfileWidget.showProfile(current.data);
-		return;
 	}
 });
 
@@ -25,8 +23,8 @@ function ratesUpdate() {
 		if (response.success) {
 			rates.clearTable();
 			rates.fillTable(response.data);
-			return;
 		}
+		return;
 	});
 }
 ratesUpdate();
@@ -40,58 +38,58 @@ const money = new MoneyManager();
 money.addMoneyCallback = credit => ApiConnector.addMoney(credit, response => {
 	if (response.success) {
 		ProfileWidget.showProfile(response.data);
-		return money.setMessage(true, 'Вы успешно пополнили счета на' + credit.currency + credit.amount);;
+		return money.setMessage(true, 'Вы успешно пополнили счет на' + credit.currency + credit.amount);
 	}
 	return money.setMessage(false, 'Ошибка: ' + response.error);
 });
 
-//Конвертация
 
+//Конвертация
 money.conversionMoneyCallback = exchange => ApiConnector.convertMoney(exchange, response => {
 	if (response.success) {
 		ProfileWidget.showProfile(response.data);
-		return money.setMessage(true, 'Конвертация успешно выполнена ' + exchange.fromCurrency + exchange.fromAmount);
+		return money.setMessage(true, 'Вы успешно конвертировали сумму ' + exchange.fromCurrency + exchange.fromAmount);
 	}
 	return money.setMessage(false, 'Ошибка: ' + response.error);
 });
 
-//Перевод
 
+//Перевод
 money.sendMoneyCallback = debit => ApiConnector.transferMoney(debit, response => {
 	if (response.success) {
 		ProfileWidget.showProfile(response.data);
-		return money.setMessage(true, 'Вы успешно выполнили перевод ' + debit.currency + debit.amount + ' получателю ' + debit.to);
+		return money.setMessage(true, 'Вы успешно перевели сумму ' + debit.currency + debit.amount + ' получателю ' + debit.to);
 	}
 	return money.setMessage(false, 'Ошибка: ' + response.error);
 });
 
-//Добавление пользователя
+//Запрос списка избранного
 const favorite = new FavoritesWidget();
 ApiConnector.getFavorites(response => {
 	if (response.success) {
 		favorite.clearTable();
 		favorite.fillTable(response.data);
 		money.updateUsersList(response.data);
-		return;
 	}
 });
+
+//Добавление пользователя
 favorite.addUserCallback = addUser => ApiConnector.addUserToFavorites(addUser, response => {
 	if (response.success) {
 		favorite.clearTable();
 		favorite.fillTable(response.data);
 		money.updateUsersList(response.data);
-		return money.setMessage(true, 'Добавлен новый пользователь #' + addUser.id + ': ' + addUser.name);
+		return favorite.setMessage(true, 'Добавлен новый пользователь #' + addUser.id + ': ' + addUser.name);
 	}
-	return money.setMessage(false, 'Ошибка: ' + response.error);
+	return favorite.setMessage(false, 'Ошибка: ' + response.error);
 });
-
 //Удаление пользователя
 favorite.removeUserCallback = deletedUser => ApiConnector.removeUserFromFavorites(deletedUser, response => {
 	if (response.success) {
 		favorite.clearTable();
 		favorite.fillTable(response.data);
 		money.updateUsersList(response.data);
-		return money.setMessage(true, 'Пользователь ' + deletedUser + ' удален');
+		return favorite.setMessage(true, 'Пользователь ' + deletedUser + ' удален');
 	}
-	return money.setMessage(false, 'Ошибка: ' + response.error);
+	return favorite.setMessage(false, 'Ошибка: ' + response.error);
 });
